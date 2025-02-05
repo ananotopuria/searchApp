@@ -1,73 +1,89 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CardList from './CardList';
+import Search from './Search';
 
-interface MainProps {
-  searchTerm: string;
-}
+const ITEMS_PER_PAGE = 10;
 
-interface MainState {
-  results: { name: string }[];
-  isLoading: boolean;
-  error: string | null;
-}
+const MainComponent = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [results, setResults] = useState<{ name: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-class Main extends Component<MainProps, MainState> {
-  constructor(props: MainProps) {
-    super(props);
-    this.state = {
-      results: [],
-      isLoading: false,
-      error: null,
+  const searchTerm = searchParams.get('q') || '';
+  const currentPage = Number(searchParams.get('page')) || 1;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+        const response = await axios.get<{ results: Array<{ name: string }> }>(
+          `https://pokeapi.co/api/v2/pokemon?limit=${ITEMS_PER_PAGE}&offset=${offset}`
+        );
+
+        setResults(response.data.results);
+      } catch (error) {
+        console.error('API Request Failed:', error);
+        setError(error instanceof Error ? error.message : 'Failed to fetch data.');
+      } finally {
+        setIsLoading(false);
+      }
     };
-  }
 
-  componentDidMount() {
-    this.fetchData();
-  }
+    fetchData();
+  }, [currentPage]);
 
-  componentDidUpdate(prevProps: MainProps) {
-    if (prevProps.searchTerm !== this.props.searchTerm) {
-      this.fetchData();
-    }
-  }
+  const filteredResults = results.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  fetchData = async () => {
-    this.setState({ isLoading: true, error: null });
-
-    try {
-      const response = await axios.get<{ results: Array<{ name: string }> }>(
-        'https://pokeapi.co/api/v2/pokemon?limit=10',
-      );
-
-      this.setState({ results: response.data.results, isLoading: false });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch data.';
-      console.error('API Request Failed:', error);
-      this.setState({ error: errorMessage, isLoading: false });
-    }
+  const handleSearch = (newSearchTerm: string) => {
+    setSearchParams({ q: newSearchTerm, page: '1' });
+    navigate(`/search?q=${newSearchTerm}&page=1`);
   };
 
-  render() {
-    const { results, isLoading, error } = this.state;
-    const { searchTerm } = this.props;
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({ q: searchTerm, page: newPage.toString() });
+    navigate(`/search?q=${searchTerm}&page=${newPage}`);
+  };
 
-    const filteredResults = searchTerm
-      ? results.filter((item) =>
-          item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-        )
-      : results;
+  return (
+    <main className="p-4">
+      <Search onSearch={handleSearch} />
 
-    return (
-      <main>
-        <h2>Search Term: {searchTerm}</h2>
-        {isLoading && <div className="loader">Loading...</div>}
-        {error && <p className="error">{error}</p>}
-        <CardList items={filteredResults} />
-      </main>
-    );
-  }
-}
+      {isLoading && <div className="loader">Loading...</div>}
+      {error && <p className="error">{error}</p>}
 
-export default Main;
+      <CardList items={filteredResults} />
+
+      <div className="flex justify-center gap-2 mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+
+        <span className="px-4 py-2 bg-blue-500 text-white rounded">
+          Page {currentPage}
+        </span>
+
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          className="px-4 py-2 bg-gray-200 rounded"
+        >
+          Next
+        </button>
+      </div>
+    </main>
+  );
+};
+
+export default MainComponent;

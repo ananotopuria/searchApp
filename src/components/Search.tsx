@@ -1,85 +1,47 @@
-// import { Component } from 'react';
-
-// interface SearchProps {
-//   onSearch: (term: string) => void;
-// }
-
-// interface SearchState {
-//   searchTerm: string;
-// }
-
-// class Search extends Component<SearchProps, SearchState> {
-//   constructor(props: SearchProps) {
-//     super(props);
-//     const savedTerm = localStorage.getItem('searchTerm') || '';
-//     this.state = { searchTerm: savedTerm };
-//   }
-
-//   handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     this.setState({ searchTerm: event.target.value });
-//   };
-
-//   handleSearch = () => {
-//     const trimmedSearch = this.state.searchTerm.trim();
-//     this.props.onSearch(trimmedSearch);
-//     localStorage.setItem('searchTerm', trimmedSearch);
-//   };
-
-//   render() {
-//     return (
-//       <div>
-//         <input
-//           type="text"
-//           value={this.state.searchTerm}
-//           onChange={this.handleInputChange}
-//         />
-//         <button onClick={this.handleSearch}>Search</button>
-//       </div>
-//     );
-//   }
-// }
-
-// export default Search;
-
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 interface SearchProps {
   onSearch: (term: string) => void;
 }
 
-interface SearchState {
-  searchTerm: string;
-}
+const Search = ({ onSearch }: SearchProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialSearchTerm =
+    searchParams.get('q') || localStorage.getItem('searchTerm') || '';
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
-class Search extends Component<SearchProps, SearchState> {
-  constructor(props: SearchProps) {
-    super(props);
-    const savedTerm = localStorage.getItem('searchTerm') || '';
-    this.state = { searchTerm: savedTerm };
-  }
+  useEffect(() => {
+    localStorage.setItem('searchTerm', searchTerm);
+  }, [searchTerm]);
 
-  handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ searchTerm: event.target.value });
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
   };
 
-  handleSearch = () => {
-    const trimmedSearch = this.state.searchTerm.trim();
-    this.props.onSearch(trimmedSearch);
-    localStorage.setItem('searchTerm', trimmedSearch);
+  const handleSearch = () => {
+    const trimmedSearch = searchTerm.trim();
+    setSearchParams({ q: trimmedSearch });
+    onSearch(trimmedSearch);
   };
 
-  render() {
-    return (
-      <div>
-        <input
-          type="text"
-          value={this.state.searchTerm}
-          onChange={this.handleInputChange}
-        />
-        <button onClick={this.handleSearch}>Search</button>
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={handleInputChange}
+        placeholder="Search Pokémon..."
+        className="p-2 border border-gray-300 rounded w-full"
+      />
+      <button
+        onClick={handleSearch}
+        className="mt-2 p-2 bg-blue-500 text-white rounded"
+      >
+        Search
+      </button>
+    </div>
+  );
+};
 
 export default Search;
