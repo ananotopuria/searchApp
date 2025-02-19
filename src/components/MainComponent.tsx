@@ -1,66 +1,88 @@
-import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { useGetPokemonQuery } from '../services/pokemonApi';
+import {
+  selectItem,
+  unselectItem,
+  clearSelection,
+} from './../store/slices/selectionSlice';
+import { downloadSelectedItems } from '../utils/downloadCSV';
 import CardList from './CardList';
 import Search from './Search';
+import Flyout from './Flyout';
+import ThemeSelector from '../components/ThemeSelector';
+import { RootState } from '../store';
+
+export interface Item {
+  name: string;
+  url: string;
+}
 
 const ITEMS_PER_PAGE = 10;
 
 const MainComponent = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [results, setResults] = useState<{ name: string }[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const searchTerm = searchParams.get('q') || '';
-  const currentPage = Number(searchParams.get('page')) || 1;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-        const response = await axios.get<{ results: Array<{ name: string }> }>(
-          `https://pokeapi.co/api/v2/pokemon?limit=${ITEMS_PER_PAGE}&offset=${offset}`
-        );
-
-        setResults(response.data.results);
-      } catch (error) {
-        console.error('API Request Failed:', error);
-        setError(error instanceof Error ? error.message : 'Failed to fetch data.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [currentPage]);
-
-  const filteredResults = results.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const dispatch = useDispatch();
+  const selectedItems = useSelector(
+    (state: RootState) => state.selection.items,
   );
 
-  const handleSearch = (newSearchTerm: string) => {
+  const searchTerm = searchParams.get('q') ?? '';
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  const { data, error, isLoading } = useGetPokemonQuery({
+    limit: ITEMS_PER_PAGE,
+    offset,
+  });
+
+  const handleSearch = (newSearchTerm: string): void => {
     setSearchParams({ q: newSearchTerm, page: '1' });
     navigate(`/search?q=${newSearchTerm}&page=1`);
   };
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = (newPage: number): void => {
     setSearchParams({ q: searchTerm, page: newPage.toString() });
     navigate(`/search?q=${searchTerm}&page=${newPage}`);
   };
 
+  const handleUnselectAll = (): void => {
+    dispatch(clearSelection());
+  };
+
+  const handleDownload = (): void => {
+    downloadSelectedItems(selectedItems);
+  };
+
+  const handleItemSelect = (item: Item): void => {
+    dispatch(selectItem(item));
+  };
+
+  const handleItemUnselect = (name: string): void => {
+    dispatch(unselectItem(name));
+  };
+
   return (
     <main className="p-4">
+      <ThemeSelector />
       <Search onSearch={handleSearch} />
 
       {isLoading && <div className="loader">Loading...</div>}
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <p className="error">
+          {'status' in error
+            ? `Error: ${error.status}`
+            : 'An unexpected error occurred.'}
+        </p>
+      )}
 
-      <CardList items={filteredResults} />
+      <CardList
+        items={(data?.results ?? []) as Item[]}
+        selectedItems={selectedItems}
+        onItemSelect={handleItemSelect}
+        onItemUnselect={handleItemUnselect}
+      />
 
       <div className="flex justify-center gap-2 mt-4">
         <button
@@ -82,6 +104,14 @@ const MainComponent = () => {
           Next
         </button>
       </div>
+
+      {selectedItems.length > 0 && (
+        <Flyout
+          selectedCount={selectedItems.length}
+          onUnselectAll={handleUnselectAll}
+          onDownload={handleDownload}
+        />
+      )}
     </main>
   );
 };
