@@ -20,6 +20,7 @@ const MainComponent = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const selectedItems = useSelector(
     (state: RootState) => state.selection.items,
   );
@@ -33,7 +34,7 @@ const MainComponent = () => {
     offset,
   });
 
-  const filteredItems = (data?.results ?? []).filter((item: Item) =>
+  const filteredItems: Item[] = (data?.results ?? []).filter((item: Item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
@@ -64,19 +65,29 @@ const MainComponent = () => {
   };
 
   return (
-    <main className="p-4">
-      <ThemeSelector />
+    <main className="max-w-6xl mx-auto p-4 space-y-8">
+      {/* Header and Theme Selector */}
+      <header className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-800">Pokémon Search</h1>
+        <ThemeSelector />
+      </header>
+
+      {/* Search Input */}
       <Search onSearch={handleSearch} />
 
-      {isLoading && <div className="loader">Loading...</div>}
+      {/* Loading & Error States */}
+      {isLoading && (
+        <div className="text-center text-gray-500">Loading Pokémon...</div>
+      )}
       {error && (
-        <p className="error">
+        <p className="text-red-500 text-center">
           {'status' in error
             ? `Error: ${error.status}`
             : 'An unexpected error occurred.'}
         </p>
       )}
 
+      {/* Pokémon Cards */}
       <CardList
         items={filteredItems}
         selectedItems={selectedItems}
@@ -84,11 +95,12 @@ const MainComponent = () => {
         onItemUnselect={handleItemUnselect}
       />
 
-      <div className="flex justify-center gap-2 mt-4">
+      {/* Pagination Controls */}
+      <div className="flex justify-center gap-4 items-center mt-8">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
         >
           Prev
         </button>
@@ -99,12 +111,13 @@ const MainComponent = () => {
 
         <button
           onClick={() => handlePageChange(currentPage + 1)}
-          className="px-4 py-2 bg-gray-200 rounded"
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
         >
           Next
         </button>
       </div>
 
+      {/* Flyout for Selected Items */}
       {selectedItems.length > 0 && (
         <Flyout
           selectedCount={selectedItems.length}

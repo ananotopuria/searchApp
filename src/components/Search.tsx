@@ -7,7 +7,8 @@ interface SearchProps {
 
 const Search = ({ onSearch }: SearchProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialSearchTerm = searchParams.get('q') || localStorage.getItem('searchTerm') || '';
+  const initialSearchTerm =
+    searchParams.get('q') || localStorage.getItem('searchTerm') || '';
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
   useEffect(() => {
@@ -25,17 +26,17 @@ const Search = ({ onSearch }: SearchProps) => {
   };
 
   return (
-    <div>
+    <div className="flex gap-2">
       <input
         type="text"
         value={searchTerm}
         onChange={handleInputChange}
         placeholder="Search Pokémon..."
-        className="p-2 border border-gray-300 rounded w-full"
+        className="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
       <button
         onClick={handleSearch}
-        className="mt-2 p-2 bg-blue-500 text-white rounded w-full"
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Search
       </button>

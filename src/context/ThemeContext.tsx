@@ -5,7 +5,6 @@ export interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-// ✅ Provides a default value to prevent 'undefined' errors
 export const ThemeContext = createContext<ThemeContextType>({
   theme: 'light',
   toggleTheme: () => {},
