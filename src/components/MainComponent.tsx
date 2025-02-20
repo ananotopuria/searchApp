@@ -5,18 +5,14 @@ import {
   selectItem,
   unselectItem,
   clearSelection,
-} from './../store/slices/selectionSlice';
+} from '../store/slices/selectionSlice';
 import { downloadSelectedItems } from '../utils/downloadCSV';
 import CardList from './CardList';
 import Search from './Search';
 import Flyout from './Flyout';
-import ThemeSelector from '../components/ThemeSelector';
+import ThemeSelector from './ThemeSelector';
 import { RootState } from '../store';
-
-export interface Item {
-  name: string;
-  url: string;
-}
+import { Item } from '../types/item';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -36,6 +32,10 @@ const MainComponent = () => {
     limit: ITEMS_PER_PAGE,
     offset,
   });
+
+  const filteredItems = (data?.results ?? []).filter((item: Item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const handleSearch = (newSearchTerm: string): void => {
     setSearchParams({ q: newSearchTerm, page: '1' });
@@ -78,7 +78,7 @@ const MainComponent = () => {
       )}
 
       <CardList
-        items={(data?.results ?? []) as Item[]}
+        items={filteredItems}
         selectedItems={selectedItems}
         onItemSelect={handleItemSelect}
         onItemUnselect={handleItemUnselect}

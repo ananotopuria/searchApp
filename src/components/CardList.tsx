@@ -1,27 +1,5 @@
-// import { Component } from 'react';
-// import Card from './Card';
-
-// interface CardListProps {
-//   items: { name: string }[];
-// }
-
-// class CardList extends Component<CardListProps> {
-//   render() {
-//     return (
-//       <div className="card-list">
-//         {this.props.items.map((item, index) => (
-//           <Card key={index} name={item.name} />
-//         ))}
-//       </div>
-//     );
-//   }
-// }
-
-// export default CardList;
-
-// 📁 src/components/CardList.tsx
 import React from 'react';
-import { Item } from '../components/MainComponent'; // Or adjust the import path to where Item is defined
+import { Item } from '../types/item';
 
 interface CardListProps {
   items: Item[];
@@ -40,7 +18,7 @@ const CardList: React.FC<CardListProps> = ({
     <div className="grid grid-cols-2 gap-4">
       {items.map((item) => {
         const isSelected = selectedItems.some(
-          (selectedItem) => selectedItem.name === item.name,
+          (selectedItem) => selectedItem.name === item.name
         );
 
         return (
@@ -50,9 +28,7 @@ const CardList: React.FC<CardListProps> = ({
                 type="checkbox"
                 checked={isSelected}
                 onChange={(e) =>
-                  e.target.checked
-                    ? onItemSelect(item)
-                    : onItemUnselect(item.name)
+                  e.target.checked ? onItemSelect(item) : onItemUnselect(item.name)
                 }
                 className="mr-2"
               />
