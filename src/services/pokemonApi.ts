@@ -1,36 +1,29 @@
-// import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
-// export const pokemonApi = createApi({
-//   reducerPath: 'pokemonApi',
-//   baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
-//   endpoints: (builder) => ({
-//     getPokemon: builder.query({
-//       query: ({ limit, offset }: { limit: number; offset: number }) =>
-//         `pokemon?limit=${limit}&offset=${offset}`,
-//     }),
-//     getPokemonByName: builder.query({
-//       query: (name: string) => `pokemon/${name}`,
-//     }),
-//   }),
-// });
-
-// export const { useGetPokemonQuery, useGetPokemonByNameQuery } = pokemonApi;
-
-// 📁 src/services/pokemonApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { PokemonListResponse, PokemonDetails } from '../types/pokemon';
 
 export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
   endpoints: (builder) => ({
-    getPokemon: builder.query({
-      query: ({ limit, offset }: { limit: number; offset: number }) =>
-        `pokemon?limit=${limit}&offset=${offset}`,
+    getAllPokemon: builder.query<PokemonListResponse, void>({
+      query: () => 'pokemon?limit=10000&offset=0',
     }),
-    getPokemonByName: builder.query({
-      query: (name: string) => `pokemon/${name}`,
+
+    getPokemon: builder.query<
+      PokemonListResponse,
+      { limit: number; offset: number }
+    >({
+      query: ({ limit, offset }) => `pokemon?limit=${limit}&offset=${offset}`,
+    }),
+
+    getPokemonByName: builder.query<PokemonDetails, string>({
+      query: (name) => `pokemon/${name.toLowerCase()}`,
     }),
   }),
 });
 
-export const { useGetPokemonQuery, useGetPokemonByNameQuery } = pokemonApi;
+export const {
+  useGetAllPokemonQuery,
+  useGetPokemonQuery,
+  useGetPokemonByNameQuery,
+} = pokemonApi;

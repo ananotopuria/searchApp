@@ -1,6 +1,9 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetPokemonQuery } from '../services/pokemonApi';
+import {
+  useGetAllPokemonQuery,
+  useGetPokemonQuery,
+} from '../services/pokemonApi';
 import {
   selectItem,
   unselectItem,
@@ -25,17 +28,32 @@ const MainComponent = () => {
     (state: RootState) => state.selection.items,
   );
 
-  const searchTerm = searchParams.get('q') ?? '';
+  const searchTerm = searchParams.get('q')?.toLowerCase().trim() ?? '';
   const currentPage = Number(searchParams.get('page')) || 1;
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  const { data, error, isLoading } = useGetPokemonQuery({
-    limit: ITEMS_PER_PAGE,
-    offset,
-  });
+  const { data: allPokemonData, isLoading: isAllPokemonLoading } =
+    useGetAllPokemonQuery();
 
-  const filteredItems: Item[] = (data?.results ?? []).filter((item: Item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  const { data: paginatedData, isLoading: isPaginatedLoading } =
+    useGetPokemonQuery({
+      limit: ITEMS_PER_PAGE,
+      offset,
+    });
+
+  const filteredItems: Item[] = searchTerm
+    ? (allPokemonData?.results ?? []).filter((item: Item) =>
+        item.name.toLowerCase().includes(searchTerm),
+      )
+    : (paginatedData?.results ?? []);
+
+  const paginatedFilteredItems = filteredItems.slice(
+    offset,
+    offset + ITEMS_PER_PAGE,
+  );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredItems.length / ITEMS_PER_PAGE),
   );
 
   const handleSearch = (newSearchTerm: string): void => {
@@ -45,84 +63,59 @@ const MainComponent = () => {
 
   const handlePageChange = (newPage: number): void => {
     setSearchParams({ q: searchTerm, page: newPage.toString() });
-    navigate(`/search?q=${searchTerm}&page=${newPage}`);
-  };
-
-  const handleUnselectAll = (): void => {
-    dispatch(clearSelection());
-  };
-
-  const handleDownload = (): void => {
-    downloadSelectedItems(selectedItems);
-  };
-
-  const handleItemSelect = (item: Item): void => {
-    dispatch(selectItem(item));
-  };
-
-  const handleItemUnselect = (name: string): void => {
-    dispatch(unselectItem(name));
   };
 
   return (
     <main className="max-w-6xl mx-auto p-4 space-y-8">
-      {/* Header and Theme Selector */}
       <header className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-800">Pokémon Search</h1>
         <ThemeSelector />
       </header>
 
-      {/* Search Input */}
       <Search onSearch={handleSearch} />
 
-      {/* Loading & Error States */}
-      {isLoading && (
-        <div className="text-center text-gray-500">Loading Pokémon...</div>
+      {isAllPokemonLoading && !searchTerm && (
+        <p className="text-center">Loading Pokémon...</p>
       )}
-      {error && (
-        <p className="text-red-500 text-center">
-          {'status' in error
-            ? `Error: ${error.status}`
-            : 'An unexpected error occurred.'}
-        </p>
+      {isPaginatedLoading && !searchTerm && (
+        <p className="text-center">Loading page data...</p>
       )}
 
-      {/* Pokémon Cards */}
       <CardList
-        items={filteredItems}
+        items={paginatedFilteredItems}
         selectedItems={selectedItems}
-        onItemSelect={handleItemSelect}
-        onItemUnselect={handleItemUnselect}
+        onItemSelect={(item) => dispatch(selectItem(item))}
+        onItemUnselect={(name) => dispatch(unselectItem(name))}
       />
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-4 items-center mt-8">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+          >
+            Prev
+          </button>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-center gap-4 items-center mt-8">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-        >
-          Prev
-        </button>
+          <span className="px-4 py-2 bg-blue-500 text-white rounded">
+            Page {currentPage} of {totalPages}
+          </span>
 
-        <span className="px-4 py-2 bg-blue-500 text-white rounded">
-          Page {currentPage}
-        </span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-        >
-          Next
-        </button>
-      </div>
-
-      {/* Flyout for Selected Items */}
       {selectedItems.length > 0 && (
         <Flyout
           selectedCount={selectedItems.length}
-          onUnselectAll={handleUnselectAll}
-          onDownload={handleDownload}
+          onUnselectAll={() => dispatch(clearSelection())}
+          onDownload={() => downloadSelectedItems(selectedItems)}
         />
       )}
     </main>

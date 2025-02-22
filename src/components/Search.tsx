@@ -7,13 +7,12 @@ interface SearchProps {
 
 const Search = ({ onSearch }: SearchProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialSearchTerm =
-    searchParams.get('q') || localStorage.getItem('searchTerm') || '';
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  const queryParam = searchParams.get('q') || '';
+  const [searchTerm, setSearchTerm] = useState(queryParam);
 
   useEffect(() => {
-    localStorage.setItem('searchTerm', searchTerm);
-  }, [searchTerm]);
+    setSearchTerm(queryParam);
+  }, [queryParam]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -25,12 +24,22 @@ const Search = ({ onSearch }: SearchProps) => {
     onSearch(trimmedSearch);
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="flex gap-2">
+      <label htmlFor="search" className="sr-only">Search Pokémon</label>
       <input
+        id="search"
+        name="search"
         type="text"
         value={searchTerm}
         onChange={handleInputChange}
+        onKeyPress={handleKeyPress}
         placeholder="Search Pokémon..."
         className="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
       />

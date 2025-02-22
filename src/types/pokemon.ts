@@ -1,5 +1,3 @@
-// 📁 src/types/pokemon.ts
-
 export interface PokemonType {
     slot: number;
     type: {
@@ -44,4 +42,11 @@ export interface PokemonType {
     stats: PokemonStat[];
     sprites: PokemonSprites;
   }
-  
+
+
+export interface PokemonListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: { name: string; url: string }[];
+}
