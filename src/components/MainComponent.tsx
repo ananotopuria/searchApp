@@ -67,6 +67,10 @@ const MainComponent = () => {
 
   return (
     <main className="max-w-6xl mx-auto p-4 space-y-8">
+      <div className="bg-white text-black dark:bg-gray-900 dark:text-white p-4 rounded">
+        <h1 className="text-2xl">Hello World</h1>
+        <p>This background changes with the theme.</p>
+      </div>
       <header className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-800">Pokémon Search</h1>
         <ThemeSelector />
@@ -80,6 +84,7 @@ const MainComponent = () => {
       {isPaginatedLoading && !searchTerm && (
         <p className="text-center">Loading page data...</p>
       )}
+      <div className="p-4 bg-gray-200 dark:bg-red-500">Test</div>
 
       <CardList
         items={paginatedFilteredItems}

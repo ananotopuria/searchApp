@@ -1,25 +1,16 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
 
-const ThemeSelector: React.FC = () => {
-  const context = useContext(ThemeContext);
-
-  if (!context) {
-    throw new Error('ThemeSelector must be used within a ThemeProvider');
-  }
-
-  const { theme, toggleTheme } = context;
+const ThemeSelector = () => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
 
   return (
-    <div className="mb-4">
-      <span>Theme: {theme}</span>
-      <button
-        className="ml-2 px-4 py-2 bg-gray-300 rounded"
-        onClick={toggleTheme}
-      >
-        Toggle Theme
-      </button>
-    </div>
+    <button
+      onClick={toggleTheme}
+      className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-black dark:text-white rounded"
+    >
+      {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+    </button>
   );
 };
 
