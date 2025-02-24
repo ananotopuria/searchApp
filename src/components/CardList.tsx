@@ -42,6 +42,24 @@ const CardList: React.FC<CardListProps> = ({
     steel: 'bg-gray-500',
     water: 'bg-blue-500',
   };
+  const statIcons = {
+    hp: '❤️',
+    attack: '⚔️',
+    defense: '🛡️',
+    'special-attack': '🔮',
+    'special-defense': '🧪',
+    speed: '💨',
+  };
+
+  const statColors = {
+    hp: 'bg-red-400',
+    attack: 'bg-orange-400',
+    defense: 'bg-yellow-400',
+    'special-attack': 'bg-purple-400',
+    'special-defense': 'bg-green-400',
+    speed: 'bg-blue-400',
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {items.map((item) => {
@@ -62,7 +80,7 @@ const CardList: React.FC<CardListProps> = ({
           >
             {data ? (
               <>
-                <h2 className="text-lg capitalize font-bold mt-2 text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg capitalize font-bold mt-2 text-gray-900 dark:text-gray-100 font-vt323 text-center">
                   {data.name}
                 </h2>
                 <img
@@ -93,37 +111,58 @@ const CardList: React.FC<CardListProps> = ({
                     ))}
                   </ul>
                 </div>
-
                 <div className="mt-4">
                   <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">
                     Abilities:
                   </h3>
-                  <ul className="mt-1">
+                  <ul className="flex gap-2 flex-wrap mt-1">
                     {data.abilities.map((ability: PokemonAbility) => (
                       <li
                         key={ability.ability.name}
-                        className="text-gray-700 dark:text-gray-300 capitalize"
+                        className="px-2 py-1 rounded bg-pokemonRed text-white dark:bg-pokemonRed dark:text-white capitalize"
                       >
                         {ability.ability.name}
                       </li>
                     ))}
                   </ul>
                 </div>
-
                 <div className="mt-4">
                   <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">
                     Base Stats:
                   </h3>
-                  <ul className="mt-1">
-                    {data.stats.map((stat: PokemonStat) => (
-                      <li
-                        key={stat.stat.name}
-                        className="flex justify-between text-gray-700 dark:text-gray-300 capitalize"
-                      >
-                        <span>{stat.stat.name}</span>
-                        <span className="font-bold">{stat.base_stat}</span>
-                      </li>
-                    ))}
+                  <ul className="mt-2 space-y-2">
+                    {data.stats.map((stat: PokemonStat) => {
+                      const color =
+                        statColors[stat.stat.name as keyof typeof statColors] ||
+                        'bg-gray-300';
+                      const icon =
+                        statIcons[stat.stat.name as keyof typeof statIcons] ||
+                        '✨';
+                      const percentage = Math.min(
+                        (stat.base_stat / 255) * 100,
+                        100,
+                      );
+
+                      return (
+                        <li
+                          key={stat.stat.name}
+                          className="text-gray-700 dark:text-gray-300 capitalize"
+                        >
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="flex items-center gap-1">
+                              {icon} {stat.stat.name}
+                            </span>
+                            <span className="font-bold">{stat.base_stat}</span>
+                          </div>
+                          <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded">
+                            <div
+                              className={`h-full rounded ${color}`}
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
 
