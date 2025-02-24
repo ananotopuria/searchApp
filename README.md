@@ -1,50 +1,54 @@
-# React + TypeScript + Vite
+#  Pokémon Search 
+# Ϟ(๑⚈ ․̫ ⚈๑)⋆
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive web application that allows users to search for Pokémon and view detailed information. Built with **React**, **TypeScript**, **Redux Toolkit**, **Tailwind CSS**, and deployed using **GitHub Pages**.
 
-Currently, two official plugins are available:
+## 🚀 **Live Demo**
+🔗 [View the deployed app here](https://ananotopuria.github.io/searchApp/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 📦 **Features**
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+👾 Search Pokémon by name  
+🛰️ View detailed Pokémon info (types, abilities, stats, height, weight)  
+🔢 Pagination and global search support  
+🎨 Responsive and mobile-friendly design using Tailwind CSS  
+🌚 Dark and light mode toggle  
+⚛️ State management with Redux Toolkit    
+✨ Continuous deployment with GitHub Pages  
 
-- Configure the top-level `parserOptions` property like this:
+---
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🛠️ **Tech Stack**
+
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS  
+- **State Management:** Redux Toolkit  
+- **Routing:** React Router DOM  
+- **HTTP Client:** Axios  
+- **Deployment:** GitHub Pages  
+
+---
+
+## 🚀 **Getting Started**
+
+### 📥 **Installation**
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/ananotopuria/searchApp.git
+cd search-app
 ```
+2. **Install dependencies:**
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+```bash
+npm install
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```
+3. **Start the development server:**
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm run dev
+
 ```
