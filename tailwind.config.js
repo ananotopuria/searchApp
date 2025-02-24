@@ -11,6 +11,7 @@ export default {
       colors: {
         pokemonYellow: '#FFCB05',
         pokemonBlue: '#3D7DCA',
+        pokemonRed: '#e21c25'
       },
     },
   },

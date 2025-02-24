@@ -41,11 +41,16 @@ const Search = ({ onSearch }: SearchProps) => {
         onChange={handleInputChange}
         onKeyPress={handleKeyPress}
         placeholder="Search Pokémon..."
-        className="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="flex-1 font-vt323 p-2 border rounded focus:outline-none focus:ring-2
+                   border-gray-300 focus:ring-pokemonBlue 
+                   dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 
+                   dark:focus:ring-pokemonYellow"
       />
       <button
         onClick={handleSearch}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        className="px-4 py-2 rounded text-white transition-colors
+                   bg-pokemonBlue hover:bg-pokemonYellow 
+                   dark:bg-pokemonBlue dark:hover:bg-pokemonYellow font-vt323"
       >
         Search
       </button>

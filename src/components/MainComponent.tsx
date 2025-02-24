@@ -68,7 +68,7 @@ const MainComponent = () => {
   return (
     <main className="bg-white text-black dark:bg-gray-900 dark:text-white">
       <div className="max-w-6xl mx-auto p-4 space-y-8">
-        <HeaderComponent/>
+        <HeaderComponent />
         <Search onSearch={handleSearch} />
         {isAllPokemonLoading && !searchTerm && (
           <p className="text-center">Loading Pokémon...</p>
@@ -76,8 +76,6 @@ const MainComponent = () => {
         {isPaginatedLoading && !searchTerm && (
           <p className="text-center">Loading page data...</p>
         )}
-        <div className="p-4 bg-gray-200 dark:bg-red-500">Test</div>
-
         <CardList
           items={paginatedFilteredItems}
           selectedItems={selectedItems}
