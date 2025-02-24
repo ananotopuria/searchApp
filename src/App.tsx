@@ -9,7 +9,7 @@ import NotFound from './pages/NotFound';
 
 const App = () => {
   return (
-    <Router basename="/search-app">
+    <Router basename="/searchApp">
       <Routes>
         <Route path="/" element={<Navigate to="/search?page=1" replace />} />
         <Route path="/search" element={<MainComponent />} />
