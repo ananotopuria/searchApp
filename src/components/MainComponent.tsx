@@ -13,9 +13,9 @@ import { downloadSelectedItems } from '../utils/downloadCSV';
 import CardList from './CardList';
 import Search from './Search';
 import Flyout from './Flyout';
-import ThemeSelector from './ThemeSelector';
 import { RootState } from '../store';
 import { Item } from '../types/item';
+import HeaderComponent from './HeaderComponent';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -66,63 +66,56 @@ const MainComponent = () => {
   };
 
   return (
-    <main className="max-w-6xl mx-auto p-4 space-y-8">
-      <div className="bg-white text-black dark:bg-gray-900 dark:text-white p-4 rounded">
-        <h1 className="text-2xl">Hello World</h1>
-        <p>This background changes with the theme.</p>
-      </div>
-      <header className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Pokémon Search</h1>
-        <ThemeSelector />
-      </header>
+    <main className="bg-white text-black dark:bg-gray-900 dark:text-white">
+      <div className="max-w-6xl mx-auto p-4 space-y-8">
+        <HeaderComponent/>
+        <Search onSearch={handleSearch} />
+        {isAllPokemonLoading && !searchTerm && (
+          <p className="text-center">Loading Pokémon...</p>
+        )}
+        {isPaginatedLoading && !searchTerm && (
+          <p className="text-center">Loading page data...</p>
+        )}
+        <div className="p-4 bg-gray-200 dark:bg-red-500">Test</div>
 
-      <Search onSearch={handleSearch} />
-
-      {isAllPokemonLoading && !searchTerm && (
-        <p className="text-center">Loading Pokémon...</p>
-      )}
-      {isPaginatedLoading && !searchTerm && (
-        <p className="text-center">Loading page data...</p>
-      )}
-      <div className="p-4 bg-gray-200 dark:bg-red-500">Test</div>
-
-      <CardList
-        items={paginatedFilteredItems}
-        selectedItems={selectedItems}
-        onItemSelect={(item) => dispatch(selectItem(item))}
-        onItemUnselect={(name) => dispatch(unselectItem(name))}
-      />
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-4 items-center mt-8">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-          >
-            Prev
-          </button>
-
-          <span className="px-4 py-2 bg-blue-500 text-white rounded">
-            Page {currentPage} of {totalPages}
-          </span>
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage >= totalPages}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      )}
-
-      {selectedItems.length > 0 && (
-        <Flyout
-          selectedCount={selectedItems.length}
-          onUnselectAll={() => dispatch(clearSelection())}
-          onDownload={() => downloadSelectedItems(selectedItems)}
+        <CardList
+          items={paginatedFilteredItems}
+          selectedItems={selectedItems}
+          onItemSelect={(item) => dispatch(selectItem(item))}
+          onItemUnselect={(name) => dispatch(unselectItem(name))}
         />
-      )}
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-4 items-center mt-8">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            <span className="px-4 py-2 bg-blue-500 text-white rounded">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
+
+        {selectedItems.length > 0 && (
+          <Flyout
+            selectedCount={selectedItems.length}
+            onUnselectAll={() => dispatch(clearSelection())}
+            onDownload={() => downloadSelectedItems(selectedItems)}
+          />
+        )}
+      </div>
     </main>
   );
 };
