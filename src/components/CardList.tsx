@@ -22,7 +22,26 @@ const CardList: React.FC<CardListProps> = ({
   onItemUnselect,
 }) => {
   const pokemonDetails = usePokemonDetails(items);
-
+  const typeColors = {
+    bug: 'bg-lime-500',
+    dark: 'bg-gray-800',
+    dragon: 'bg-indigo-600',
+    electric: 'bg-yellow-400',
+    fairy: 'bg-pink-400',
+    fighting: 'bg-red-700',
+    fire: 'bg-red-500',
+    flying: 'bg-sky-300',
+    ghost: 'bg-purple-600',
+    grass: 'bg-green-500',
+    ground: 'bg-yellow-600',
+    ice: 'bg-cyan-300',
+    normal: 'bg-gray-400',
+    poison: 'bg-purple-500',
+    psychic: 'bg-pink-500',
+    rock: 'bg-yellow-700',
+    steel: 'bg-gray-500',
+    water: 'bg-blue-500',
+  };
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {items.map((item) => {
@@ -63,7 +82,11 @@ const CardList: React.FC<CardListProps> = ({
                     {data.types.map((type: PokemonType) => (
                       <li
                         key={type.type.name}
-                        className="px-2 py-1 bg-pokemonBlue dark:bg-blue-600 rounded text-white capitalize"
+                        className={`px-2 py-1 rounded text-white font-press capitalize ${
+                          typeColors[
+                            type.type.name as keyof typeof typeColors
+                          ] || 'bg-gray-300'
+                        }`}
                       >
                         {type.type.name}
                       </li>
