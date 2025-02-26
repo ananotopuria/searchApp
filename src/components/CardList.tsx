@@ -1,6 +1,7 @@
 import React from 'react';
 import { Item } from '../types/item';
 import { usePokemonDetails } from '../hooks/usePokemonDetails';
+import { useFavorites } from '../hooks/useFavorites';
 import {
   PokemonDetails,
   PokemonType,
@@ -22,6 +23,16 @@ const CardList: React.FC<CardListProps> = ({
   onItemUnselect,
 }) => {
   const pokemonDetails = usePokemonDetails(items);
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+
+  const toggleFavorite = (pokemonName: string) => {
+    if (isFavorite(pokemonName)) {
+      removeFavorite(pokemonName);
+    } else {
+      addFavorite(pokemonName);
+    }
+  };
+
   const typeColors = {
     bug: 'bg-lime-500',
     dark: 'bg-gray-800',
@@ -42,6 +53,7 @@ const CardList: React.FC<CardListProps> = ({
     steel: 'bg-gray-500',
     water: 'bg-blue-500',
   };
+
   const statIcons = {
     hp: '❤️',
     attack: '⚔️',
@@ -67,20 +79,33 @@ const CardList: React.FC<CardListProps> = ({
         const isSelected = selectedItems.some(
           (selectedItem) => selectedItem.name === item.name,
         );
+        const favorite = isFavorite(item.name);
 
         return (
           <div
             key={item.name}
-            className={`border rounded-lg p-4 shadow hover:shadow-lg transition
-              ${
-                isSelected
-                  ? 'bg-gray-300 dark:bg-gray-600 border-gray-500'
-                  : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600'
-              }`}
+            className={`border rounded-lg p-4 shadow hover:shadow-lg transition relative ${
+              isSelected
+                ? 'bg-gray-300 dark:bg-gray-600 border-gray-500'
+                : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600'
+            }`}
           >
             {data ? (
               <>
-                <h2 className="text-lg capitalize font-bold mt-2 text-gray-900 dark:text-gray-100 font-vt323 text-center">
+                {/* Favorite Button */}
+                <button
+                  onClick={() => toggleFavorite(item.name)}
+                  className={`absolute top-2 right-2 text-2xl ${
+                    favorite ? 'text-red-500' : 'text-gray-400'
+                  } hover:scale-110 transition-transform`}
+                  aria-label={
+                    favorite ? 'Remove from favorites' : 'Add to favorites'
+                  }
+                >
+                  {favorite ? '💖' : '🤍'}
+                </button>
+
+                <h2 className="text-lg capitalize font-bold mt-2 text-center text-gray-900 dark:text-gray-100">
                   {data.name}
                 </h2>
                 <img
@@ -92,6 +117,7 @@ const CardList: React.FC<CardListProps> = ({
                   Height: {data.height} | Weight: {data.weight}
                 </p>
 
+                {/* Types */}
                 <div className="mt-4">
                   <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">
                     Types:
@@ -100,7 +126,7 @@ const CardList: React.FC<CardListProps> = ({
                     {data.types.map((type: PokemonType) => (
                       <li
                         key={type.type.name}
-                        className={`px-2 py-1 rounded text-white font-press capitalize ${
+                        className={`px-2 py-1 rounded text-white capitalize ${
                           typeColors[
                             type.type.name as keyof typeof typeColors
                           ] || 'bg-gray-300'
@@ -111,6 +137,8 @@ const CardList: React.FC<CardListProps> = ({
                     ))}
                   </ul>
                 </div>
+
+                {/* Abilities */}
                 <div className="mt-4">
                   <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">
                     Abilities:
@@ -119,13 +147,15 @@ const CardList: React.FC<CardListProps> = ({
                     {data.abilities.map((ability: PokemonAbility) => (
                       <li
                         key={ability.ability.name}
-                        className="px-2 py-1 rounded bg-pokemonRed text-white dark:bg-pokemonRed dark:text-white capitalize"
+                        className="px-2 py-1 rounded bg-pokemonRed text-white capitalize"
                       >
                         {ability.ability.name}
                       </li>
                     ))}
                   </ul>
                 </div>
+
+                {/* Base Stats */}
                 <div className="mt-4">
                   <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">
                     Base Stats:
@@ -166,6 +196,7 @@ const CardList: React.FC<CardListProps> = ({
                   </ul>
                 </div>
 
+                {/* Selection Checkbox */}
                 <label className="flex items-center justify-between mt-4">
                   <span className="capitalize text-sm font-medium text-gray-700 dark:text-gray-200">
                     Select
@@ -173,11 +204,13 @@ const CardList: React.FC<CardListProps> = ({
                   <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={(e) =>
-                      e.target.checked
-                        ? onItemSelect(item)
-                        : onItemUnselect(item.name)
-                    }
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        onItemSelect(item);
+                      } else {
+                        onItemUnselect(item.name);
+                      }
+                    }}
                     className="w-5 h-5 text-blue-500"
                   />
                 </label>
