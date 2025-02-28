@@ -15,7 +15,10 @@ interface FilterOptions {
 interface CardListProps {
   items: Item[];
   selectedItems: Item[];
+  onItemSelect: (item: Item) => void;
+  onItemUnselect: (name: string) => void;
 }
+
 
 const typeColors: Record<string, string> = {
   bug: 'bg-lime-500',
